@@ -7,12 +7,12 @@ export type RoastInput = {
 };
 
 export type RoastSummary = {
-  codingHabits: string;
-  projectNaming: string;
-  consistency: string;
-  overallVibe: string;
-  score: number;
-  compliment: string;
+  observation: string;
+  patternNoticed: string;
+  publicPerception: string;
+  verdict: string;
+  profileScore: number;
+  finalLine: string;
 };
 
 export type RoastOutput = {

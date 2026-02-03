@@ -83,13 +83,7 @@ export async function getRoast(username: string): Promise<RoastOutput> {
   // Use messages directly from AI client (already structured)
   const messages = roastResult.messages;
 
-  const summary = buildSummary({
-    profile,
-    repos,
-    commits,
-    comments,
-    roastMessage: messages.join(" ")
-  });
+  const summary = buildSummary(roastResult);
 
   const output: RoastOutput = {
     username: profile.login,

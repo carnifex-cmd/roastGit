@@ -6,54 +6,54 @@ export function RoastSummaryCard({ summary }: { summary: RoastSummary }) {
       <div className="flex flex-col gap-8">
         <div>
           <p className="text-micro uppercase text-ink/45">
-            Roast Summary
+            The Verdict
           </p>
           <h2 className="mt-3 text-headline font-semibold tracking-tightish">
-            The polite verdict
+            What it all adds up to
           </h2>
         </div>
 
         <div className="grid gap-6">
           <div>
             <p className="text-micro uppercase text-ink/50">
-              Coding Habits
+              Observation
             </p>
-            <p className="mt-2 text-sm text-ink/75">{summary.codingHabits}</p>
+            <p className="mt-2 text-sm text-ink/75">{summary.observation}</p>
           </div>
           <div>
             <p className="text-micro uppercase text-ink/50">
-              Project Naming
+              Pattern Noticed
             </p>
-            <p className="mt-2 text-sm text-ink/75">{summary.projectNaming}</p>
+            <p className="mt-2 text-sm text-ink/75">{summary.patternNoticed}</p>
           </div>
           <div>
             <p className="text-micro uppercase text-ink/50">
-              Consistency
+              How This Reads Publicly
             </p>
-            <p className="mt-2 text-sm text-ink/75">{summary.consistency}</p>
+            <p className="mt-2 text-sm text-ink/75">{summary.publicPerception}</p>
           </div>
           <div>
             <p className="text-micro uppercase text-ink/50">
-              Overall GitHub Vibe
+              What It Adds Up To
             </p>
-            <p className="mt-2 text-sm text-ink/75">{summary.overallVibe}</p>
+            <p className="mt-2 text-sm text-ink/75">{summary.verdict}</p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-mist/80 px-6 py-5">
           <div>
             <p className="text-micro uppercase text-ink/50">
-              Roast Score
+              Profile Score
             </p>
             <p className="mt-2 text-3xl font-semibold text-ink">
-              {summary.score}
+              {summary.profileScore}
             </p>
           </div>
           <div className="max-w-sm">
             <p className="text-micro uppercase text-ink/50">
-              Compliment
+              Final Line
             </p>
-            <p className="mt-2 text-sm text-ink/70">{summary.compliment}</p>
+            <p className="mt-2 text-sm text-ink/70">{summary.finalLine}</p>
           </div>
         </div>
       </div>
