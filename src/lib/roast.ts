@@ -1,9 +1,9 @@
 import { getAIClient } from "@/ai";
 import { getProfile, getRecentComments, getRecentCommits, getRecentRepos } from "@/lib/github";
 import { buildSummary } from "@/lib/roastSummary";
-import type { RoastOutput } from "@/lib/types";
+import type { GitHubComment, GitHubCommit, GitHubRepo, RoastOutput } from "@/lib/types";
 import { getCache, setCache } from "@/lib/cache";
-import { splitSentences, truncate } from "@/lib/utils";
+import { truncate } from "@/lib/utils";
 
 const CACHE_TTL_MS = 7 * 60 * 1000;
 
@@ -20,7 +20,7 @@ function formatProfileSummary(profile: Awaited<ReturnType<typeof getProfile>>) {
   ].join("\n");
 }
 
-function formatRepos(repos: Awaited<ReturnType<typeof getRecentRepos>>) {
+function formatRepos(repos: GitHubRepo[]) {
   if (repos.length === 0) return "(no recent repositories)";
   return repos
     .map((repo) => {
@@ -30,43 +30,18 @@ function formatRepos(repos: Awaited<ReturnType<typeof getRecentRepos>>) {
     .join("\n");
 }
 
-function formatCommits(commits: Awaited<ReturnType<typeof getRecentCommits>>) {
+function formatCommits(commits: GitHubCommit[]) {
   if (commits.length === 0) return "(no recent commits found)";
   return commits
     .map((commit) => `${commit.repo}: ${truncate(commit.message, 140)} (${commit.date})`)
     .join("\n");
 }
 
-function formatComments(comments: Awaited<ReturnType<typeof getRecentComments>>) {
+function formatComments(comments: GitHubComment[]) {
   if (comments.length === 0) return "(no recent comments found)";
   return comments
     .map((comment) => `${comment.repo}: ${truncate(comment.body, 120)} (${comment.date})`)
     .join("\n");
-}
-
-function splitRoastMessage(message: string) {
-  const sentences = splitSentences(message);
-  if (sentences.length === 0 && message.trim().length > 0) {
-    return [message.trim()];
-  }
-  if (sentences.length >= 3) return sentences.slice(0, 3);
-  if (sentences.length === 2) {
-    const tailParts = sentences[1]
-      .split(/,|;|—/)
-      .map((part) => part.trim())
-      .filter(Boolean);
-    if (tailParts.length >= 2) {
-      return [sentences[0], tailParts[0], tailParts.slice(1).join(", ")];
-    }
-  }
-  if (sentences.length === 1) {
-    const parts = message
-      .split(/,|;|—/)
-      .map((part) => part.trim())
-      .filter(Boolean);
-    if (parts.length >= 3) return parts.slice(0, 3);
-  }
-  return sentences;
 }
 
 export async function getRoast(username: string): Promise<RoastOutput> {
@@ -74,12 +49,27 @@ export async function getRoast(username: string): Promise<RoastOutput> {
   const cached = getCache<RoastOutput>(cacheKey);
   if (cached) return cached;
 
-  const [profile, repos, comments] = await Promise.all([
-    getProfile(username),
+  // Fetch profile first - this is required and will throw UserNotFoundError if user doesn't exist
+  const profile = await getProfile(username);
+
+  // Fetch repos, comments with resilience - these can fail without breaking the roast
+  const [reposResult, commentsResult] = await Promise.allSettled([
     getRecentRepos(username, 5),
     getRecentComments(username, 5)
   ]);
-  const commits = await getRecentCommits(username, repos, 10);
+
+  const repos: GitHubRepo[] = reposResult.status === "fulfilled" ? reposResult.value : [];
+  const comments: GitHubComment[] = commentsResult.status === "fulfilled" ? commentsResult.value : [];
+
+  // Commits depend on repos, so only fetch if repos succeeded
+  let commits: GitHubCommit[] = [];
+  if (repos.length > 0) {
+    try {
+      commits = await getRecentCommits(username, repos, 10);
+    } catch {
+      // Commits fetch failed, proceed without them
+    }
+  }
 
   const aiClient = getAIClient();
   const roastResult = await aiClient.generateRoast({
@@ -90,13 +80,15 @@ export async function getRoast(username: string): Promise<RoastOutput> {
     stage: "final"
   });
 
-  const messages = splitRoastMessage(roastResult.message);
+  // Use messages directly from AI client (already structured)
+  const messages = roastResult.messages;
+
   const summary = buildSummary({
     profile,
     repos,
     commits,
     comments,
-    roastMessage: roastResult.message
+    roastMessage: messages.join(" ")
   });
 
   const output: RoastOutput = {

@@ -1,7 +1,7 @@
 import type { RoastInput } from "@/lib/types";
 
 export type RoastResult = {
-  message: string;
+  messages: string[];
 };
 
 export interface AIClient {

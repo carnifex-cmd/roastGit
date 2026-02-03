@@ -89,30 +89,30 @@ export function RoastFlow({ username }: { username: string }) {
     <div className="w-full max-w-2xl">
       {!showSummary && (
         <div
-          className={`flex flex-col gap-6 transition-opacity duration-500 ${
-            fadeOut ? "opacity-0" : "opacity-100"
-          }`}
+          className={`flex flex-col gap-6 transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"
+            }`}
         >
           {data.messages.slice(0, visibleCount).map((message, index) => (
-            <div
-              key={`ai-${index}`}
-              className="max-w-[80%] rounded-3xl bg-mist px-6 py-4 text-sm leading-relaxed text-ink/80 shadow-soft animate-fade-in"
-            >
-              {message}
-            </div>
-          ))}
-
-          {userReplies.map((reply, index) => (
-            <div
-              key={`user-${index}`}
-              className="ml-auto max-w-[80%] rounded-3xl bg-white/80 px-6 py-4 text-sm text-ink/70 shadow-soft"
-            >
-              {reply}
+            <div key={`pair-${index}`} className="flex flex-col gap-6">
+              {/* AI message */}
+              <div
+                className="max-w-[80%] rounded-3xl bg-mist px-6 py-4 text-sm leading-relaxed text-ink/80 shadow-soft animate-fade-in"
+              >
+                {message}
+              </div>
+              {/* User reply (if exists for this message) */}
+              {userReplies[index] && (
+                <div
+                  className="ml-auto max-w-[80%] rounded-3xl bg-white/80 px-6 py-4 text-sm text-ink/70 shadow-soft"
+                >
+                  {userReplies[index]}
+                </div>
+              )}
             </div>
           ))}
 
           {visibleCount <= data.messages.length &&
-          userReplies.length < data.messages.length ? (
+            userReplies.length < visibleCount ? (
             <div className="flex flex-wrap gap-3">
               {replies[userReplies.length]?.map((reply) => (
                 <button

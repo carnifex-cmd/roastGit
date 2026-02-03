@@ -8,6 +8,13 @@ import { paginate } from "@/lib/pagination";
 
 const API_BASE = "https://api.github.com";
 
+export class UserNotFoundError extends Error {
+  constructor(username: string) {
+    super(`GitHub user "${username}" not found.`);
+    this.name = "UserNotFoundError";
+  }
+}
+
 async function fetchGitHubJSON<T>(path: string): Promise<T> {
   const token = process.env.GITHUB_TOKEN;
   const response = await fetch(`${API_BASE}${path}`, {
@@ -18,6 +25,12 @@ async function fetchGitHubJSON<T>(path: string): Promise<T> {
   });
 
   if (!response.ok) {
+    if (response.status === 404) {
+      // Extract username from path if possible
+      const usernameMatch = path.match(/\/users\/([^/]+)/);
+      const username = usernameMatch ? usernameMatch[1] : "unknown";
+      throw new UserNotFoundError(username);
+    }
     const errorText = await response.text();
     throw new Error(`GitHub request failed: ${response.status} ${errorText}`);
   }
@@ -49,27 +62,32 @@ export async function getRecentCommits(
   for (const repo of repos) {
     if (commits.length >= limit) break;
 
-    const repoCommits = await paginate(
-      async (page, perPage) => {
-        const data = await fetchGitHubJSON<
-          {
-            commit?: { message?: string; author?: { date?: string } };
-          }[]
-        >(
-          `/repos/${repo.full_name}/commits?author=${username}&per_page=${perPage}&page=${page}`
-        );
+    try {
+      const repoCommits = await paginate(
+        async (page, perPage) => {
+          const data = await fetchGitHubJSON<
+            {
+              commit?: { message?: string; author?: { date?: string } };
+            }[]
+          >(
+            `/repos/${repo.full_name}/commits?author=${username}&per_page=${perPage}&page=${page}`
+          );
 
-        return data.map((item) => ({
-          repo: repo.name,
-          message: item.commit?.message ?? "(no message)",
-          date: item.commit?.author?.date ?? repo.updated_at
-        }));
-      },
-      limit - commits.length,
-      { perPage: 10, maxPages: 3 }
-    );
+          return data.map((item) => ({
+            repo: repo.name,
+            message: item.commit?.message ?? "(no message)",
+            date: item.commit?.author?.date ?? repo.updated_at
+          }));
+        },
+        limit - commits.length,
+        { perPage: 10, maxPages: 3 }
+      );
 
-    commits.push(...repoCommits);
+      commits.push(...repoCommits);
+    } catch {
+      // Skip this repo if commits fetch fails (e.g., empty repo)
+      continue;
+    }
   }
 
   return commits.slice(0, limit);

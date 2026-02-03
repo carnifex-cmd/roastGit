@@ -31,7 +31,7 @@ body {
 }
 
 input::placeholder {
-  color: rgba(29, 29, 27, 0.35);
+  color: rgba(29, 29, 27, 0.55);
 }
 
 .fade-enter {

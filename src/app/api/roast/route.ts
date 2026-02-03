@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getRoast } from "@/lib/roast";
 import { getRequestKey, rateLimit } from "@/lib/rateLimit";
+import { UserNotFoundError } from "@/lib/github";
 
 export async function POST(request: Request) {
   const { username } = (await request.json()) as { username?: string };
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
       }
     });
   } catch (error) {
+    if (error instanceof UserNotFoundError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 404 }
+      );
+    }
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
