@@ -33,14 +33,14 @@ export function FAQSection() {
     }, []);
 
     return (
-        <section className="px-6 py-24">
-            <div className="mx-auto flex max-w-2xl flex-col gap-8">
+        <section className="px-6 py-16">
+            <div className="mx-auto flex max-w-2xl flex-col gap-5">
                 <p className="text-center text-micro uppercase text-ink/50">
                     Questions
                 </p>
-                <div className="divide-y divide-ink/10">
+                <div className="divide-y divide-ink/15">
                     {faqs.map((faq, index) => (
-                        <div key={index} className="py-5">
+                        <div key={index} className="py-4">
                             <button
                                 onClick={() => toggle(index)}
                                 className="flex w-full items-center justify-between text-left"
@@ -53,7 +53,7 @@ export function FAQSection() {
                                 </span>
                             </button>
                             <div
-                                className={`overflow-hidden transition-all duration-150 ease-out ${openIndex === index ? "mt-3 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                                className={`overflow-hidden transition-all duration-150 ease-out ${openIndex === index ? "mt-2 max-h-40 opacity-100" : "max-h-0 opacity-0"
                                     }`}
                             >
                                 <p className="text-body text-ink/70">{faq.answer}</p>
