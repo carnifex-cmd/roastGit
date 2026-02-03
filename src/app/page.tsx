@@ -5,10 +5,12 @@ import { ExampleRoast } from "@/components/ExampleRoast";
 import { FAQSection } from "@/components/FAQSection";
 import { SecondaryCTA } from "@/components/SecondaryCTA";
 import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
 
 export default function HomePage() {
   return (
     <>
+      <Navbar />
       <LandingHero />
       <FeaturesSection />
       <HowItWorks />
