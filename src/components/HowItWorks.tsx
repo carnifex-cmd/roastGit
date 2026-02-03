@@ -6,7 +6,7 @@ const steps = [
 
 export function HowItWorks() {
     return (
-        <section className="px-6 py-16">
+        <section id="how-it-works" className="px-6 py-16">
             <div className="mx-auto flex max-w-xl flex-col items-center gap-6">
                 <p className="text-micro uppercase text-ink/50">How it works</p>
                 <ol className="flex flex-col gap-5">

@@ -13,12 +13,10 @@ export function Navbar() {
                     RoastGit
                 </Link>
                 <a
-                    href="https://github.com/carnifex-cmd/roastGit"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="#how-it-works"
                     className="text-sm text-ink/50 transition hover:text-ink/80"
                 >
-                    GitHub
+                    How it works
                 </a>
             </div>
         </nav>

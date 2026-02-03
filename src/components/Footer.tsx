@@ -6,6 +6,9 @@ export function Footer() {
                 <p className="text-xs text-ink/40">
                     Made for fun. Uses the GitHub API. Not affiliated with GitHub.
                 </p>
+                <p className="text-xs text-ink/30">
+                    © {new Date().getFullYear()} RoastGit. All rights reserved.
+                </p>
             </div>
         </footer>
     );
