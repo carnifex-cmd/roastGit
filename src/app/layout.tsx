@@ -11,7 +11,10 @@ const instrumentSans = Instrument_Sans({
 
 export const metadata: Metadata = {
   title: "RoastGit — Tasteful GitHub Roasts",
-  description: "Minimal, premium GitHub profile roasts with restraint."
+  description: "Minimal, premium GitHub profile roasts with restraint.",
+  icons: {
+    icon: "/icon.png",
+  }
 };
 
 export default function RootLayout({
