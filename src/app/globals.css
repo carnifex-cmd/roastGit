@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-paper: 245 242 237;
+  --color-ink: 29 29 27;
+  --color-mist: 232 228 222;
+  --color-accent: 138 120 94;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-feature-settings: "ss01" on, "ss02" on;
+}
+
+body {
+  min-height: 100vh;
+  background: rgb(var(--color-paper));
+  color: rgb(var(--color-ink));
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: rgb(var(--color-mist));
+  color: rgb(var(--color-ink));
+}
+
+input::placeholder {
+  color: rgba(29, 29, 27, 0.35);
+}
+
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
