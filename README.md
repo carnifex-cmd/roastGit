@@ -16,6 +16,7 @@ Tasteful, minimal GitHub profile roasts with a premium, calm UI. Built to feel i
 │   │   ├── AIClient.ts
 │   │   ├── MockAIClient.ts
 │   │   ├── OpenAIClient.ts
+│   │   ├── PerplexityClient.ts
 │   │   └── index.ts
 │   ├── app
 │   │   ├── api
@@ -70,6 +71,10 @@ All AI provider logic lives in `/src/ai`.
 Switching providers is a **one-line change**:
 ```
 AI_PROVIDER=openai
+```
+or
+```
+AI_PROVIDER=perplexity
 ```
 
 ## Backend API Routes
