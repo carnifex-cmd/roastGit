@@ -1,27 +1,37 @@
-type Bucket = {
-  count: number;
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+type RateLimitResult = {
+  allowed: boolean;
+  remaining: number;
   resetAt: number;
 };
 
-const buckets = new Map<string, Bucket>();
-
-export function rateLimit(key: string, limit: number, windowMs: number) {
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<RateLimitResult> {
   const now = Date.now();
-  const current = buckets.get(key);
+  const windowKey = `ratelimit:${key}:${Math.floor(now / windowMs)}`;
+  const resetAt = (Math.floor(now / windowMs) + 1) * windowMs;
 
-  if (!current || now > current.resetAt) {
-    const next: Bucket = { count: 1, resetAt: now + windowMs };
-    buckets.set(key, next);
-    return { allowed: true, remaining: limit - 1, resetAt: next.resetAt };
+  const count = await redis.incr(windowKey);
+
+  // Set expiry on first request in this window
+  if (count === 1) {
+    await redis.pexpire(windowKey, windowMs);
   }
 
-  if (current.count >= limit) {
-    return { allowed: false, remaining: 0, resetAt: current.resetAt };
+  if (count > limit) {
+    return { allowed: false, remaining: 0, resetAt };
   }
 
-  current.count += 1;
-  buckets.set(key, current);
-  return { allowed: true, remaining: limit - current.count, resetAt: current.resetAt };
+  return { allowed: true, remaining: limit - count, resetAt };
 }
 
 export function getRequestKey(headers: Headers) {

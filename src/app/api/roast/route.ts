@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   }
 
   const key = getRequestKey(request.headers);
-  const limit = rateLimit(key, 6, 60_000);
+  const limit = await rateLimit(key, 6, 60_000);
 
   if (!limit.allowed) {
     return NextResponse.json(
