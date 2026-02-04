@@ -46,7 +46,7 @@ function formatComments(comments: GitHubComment[]) {
 
 export async function getRoast(username: string): Promise<RoastOutput> {
   const cacheKey = `roast:${username.toLowerCase()}`;
-  const cached = getCache<RoastOutput>(cacheKey);
+  const cached = await getCache<RoastOutput>(cacheKey);
   if (cached) return cached;
 
   // Fetch profile first - this is required and will throw UserNotFoundError if user doesn't exist

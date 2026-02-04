@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@perplexity-ai/perplexity_ai": "0.2.1",
+    "@upstash/redis": "^1.36.2",
     "next": "14.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"

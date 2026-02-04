@@ -1,24 +1,19 @@
-type CacheEntry<T> = {
-  expiresAt: number;
-  value: T;
-};
+import { Redis } from "@upstash/redis";
 
-const cache = new Map<string, CacheEntry<unknown>>();
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
-export function getCache<T>(key: string): T | undefined {
-  const entry = cache.get(key) as CacheEntry<T> | undefined;
-  if (!entry) return undefined;
-  if (Date.now() > entry.expiresAt) {
-    cache.delete(key);
-    return undefined;
-  }
-  return entry.value;
+export async function getCache<T>(key: string): Promise<T | undefined> {
+  const value = await redis.get<T>(key);
+  return value ?? undefined;
 }
 
-export function setCache<T>(key: string, value: T, ttlMs: number) {
-  cache.set(key, { value, expiresAt: Date.now() + ttlMs });
+export async function setCache<T>(key: string, value: T, ttlMs: number) {
+  await redis.set(key, value, { px: ttlMs });
 }
 
-export function clearCache(key: string) {
-  cache.delete(key);
+export async function clearCache(key: string) {
+  await redis.del(key);
 }
