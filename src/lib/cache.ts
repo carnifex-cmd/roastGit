@@ -14,6 +14,11 @@ export async function setCache<T>(key: string, value: T, ttlMs: number) {
   await redis.set(key, value, { px: ttlMs });
 }
 
+/**
+ * Manually clears a cache entry.
+ * Currently unused in production, but kept for manual cache invalidation
+ * during debugging or future admin functionality.
+ */
 export async function clearCache(key: string) {
   await redis.del(key);
 }
