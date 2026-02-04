@@ -18,13 +18,22 @@ export function RoastFlow({ username }: { username: string }) {
   const [userReplies, setUserReplies] = useState<string[]>([]);
   const [fadeOut, setFadeOut] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
-  const hasFetched = useRef(false);
+  const fetchedUsername = useRef<string | null>(null);
 
   const replies = useMemo(() => replySets.slice(0, 3), []);
 
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
+    if (fetchedUsername.current === username) return;
+    fetchedUsername.current = username;
+
+    // Reset all state for new username
+    setData(null);
+    setError(null);
+    setLoading(true);
+    setVisibleCount(0);
+    setUserReplies([]);
+    setFadeOut(false);
+    setShowSummary(false);
 
     async function loadRoast() {
       try {
