@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import Link from "next/link";
 import type { RoastOutput } from "@/lib/types";
 import { RoastSummaryCard } from "@/components/RoastSummaryCard";
 
@@ -10,9 +11,46 @@ const replySets = [
   ["All right", "Understood"]
 ];
 
+type ErrorType = "not_found" | "rate_limit" | "network" | "server";
+
+type ErrorInfo = {
+  type: ErrorType;
+  message: string;
+  canRetry: boolean;
+};
+
+function categorizeError(status: number | null, errorMessage: string): ErrorInfo {
+  if (status === 404) {
+    return {
+      type: "not_found",
+      message: "Couldn't find that GitHub user. Double-check the username.",
+      canRetry: false
+    };
+  }
+  if (status === 429) {
+    return {
+      type: "rate_limit",
+      message: "Too many requests. Try again in a minute.",
+      canRetry: true
+    };
+  }
+  if (status === null) {
+    return {
+      type: "network",
+      message: "Connection issue. Check your network and try again.",
+      canRetry: true
+    };
+  }
+  return {
+    type: "server",
+    message: "Something went wrong on our end. Try again.",
+    canRetry: true
+  };
+}
+
 export function RoastFlow({ username }: { username: string }) {
   const [data, setData] = useState<RoastOutput | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(0);
   const [userReplies, setUserReplies] = useState<string[]>([]);
@@ -22,46 +60,50 @@ export function RoastFlow({ username }: { username: string }) {
 
   const replies = useMemo(() => replySets.slice(0, 3), []);
 
-  useEffect(() => {
-    if (fetchedUsername.current === username) return;
-    fetchedUsername.current = username;
-
-    // Reset all state for new username
+  const loadRoast = useCallback(async () => {
     setData(null);
-    setError(null);
+    setErrorInfo(null);
     setLoading(true);
     setVisibleCount(0);
     setUserReplies([]);
     setFadeOut(false);
     setShowSummary(false);
 
-    async function loadRoast() {
-      try {
-        const response = await fetch("/api/roast", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username })
-        });
+    try {
+      const response = await fetch("/api/roast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      });
 
-        const payload = (await response.json()) as RoastOutput & {
-          error?: string;
-        };
+      const payload = (await response.json()) as RoastOutput & {
+        error?: string;
+      };
 
-        if (!response.ok) {
-          throw new Error(payload.error ?? "Failed to load roast.");
-        }
-
-        setData(payload);
-        setVisibleCount(1);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unexpected error.");
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        setErrorInfo(categorizeError(response.status, payload.error ?? ""));
+        return;
       }
-    }
 
-    loadRoast();
+      setData(payload);
+      setVisibleCount(1);
+    } catch {
+      setErrorInfo(categorizeError(null, "Network error"));
+    } finally {
+      setLoading(false);
+    }
   }, [username]);
+
+  useEffect(() => {
+    if (fetchedUsername.current === username) return;
+    fetchedUsername.current = username;
+    loadRoast();
+  }, [username, loadRoast]);
+
+  function handleRetry() {
+    fetchedUsername.current = null;
+    loadRoast();
+  }
 
   function handleReply(reply: string) {
     setUserReplies((current) => [...current, reply]);
@@ -86,10 +128,37 @@ export function RoastFlow({ username }: { username: string }) {
     );
   }
 
-  if (error || !data) {
+  if (errorInfo || !data) {
     return (
-      <div className="w-full max-w-2xl rounded-3xl bg-white/70 p-10 text-center text-ink/60 shadow-soft">
-        {error ?? "Unable to load the roast."}
+      <div className="w-full max-w-2xl rounded-3xl bg-white/70 p-10 shadow-soft animate-fade-in">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="text-4xl">
+            {errorInfo?.type === "not_found" && "🔍"}
+            {errorInfo?.type === "rate_limit" && "⏱️"}
+            {errorInfo?.type === "network" && "📡"}
+            {errorInfo?.type === "server" && "⚠️"}
+            {!errorInfo && "⚠️"}
+          </div>
+          <p className="text-ink/70 text-lg">
+            {errorInfo?.message ?? "Unable to load the roast."}
+          </p>
+          <div className="flex gap-3">
+            {errorInfo?.canRetry && (
+              <button
+                onClick={handleRetry}
+                className="rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper transition hover:translate-y-[-1px]"
+              >
+                Try Again
+              </button>
+            )}
+            <Link
+              href="/"
+              className="rounded-full bg-white/80 px-6 py-3 text-sm font-medium text-ink/70 ring-1 ring-ink/10 transition hover:bg-white"
+            >
+              Go Back
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
