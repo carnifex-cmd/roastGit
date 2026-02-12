@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
+import { WebVitals } from "@/components/WebVitals";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -73,8 +74,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={instrumentSans.variable}>
       <body className="antialiased">
+        <WebVitals />
         <div className="min-h-screen">{children}</div>
       </body>
     </html>
   );
 }
+

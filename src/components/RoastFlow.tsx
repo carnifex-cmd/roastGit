@@ -48,15 +48,21 @@ function categorizeError(status: number | null, errorMessage: string): ErrorInfo
   };
 }
 
-export function RoastFlow({ username }: { username: string }) {
-  const [data, setData] = useState<RoastOutput | null>(null);
+type RoastFlowProps = {
+  username: string;
+  initialData?: RoastOutput | null;
+};
+
+export function RoastFlow({ username, initialData }: RoastFlowProps) {
+  const hasInitialData = initialData != null;
+  const [data, setData] = useState<RoastOutput | null>(initialData ?? null);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [loading, setLoading] = useState(!hasInitialData);
+  const [visibleCount, setVisibleCount] = useState(hasInitialData ? 1 : 0);
   const [userReplies, setUserReplies] = useState<string[]>([]);
   const [fadeOut, setFadeOut] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
-  const fetchedUsername = useRef<string | null>(null);
+  const fetchedUsername = useRef<string | null>(hasInitialData ? username : null);
 
   const replies = useMemo(() => replySets.slice(0, 3), []);
 
@@ -122,7 +128,7 @@ export function RoastFlow({ username }: { username: string }) {
 
   if (loading) {
     return (
-      <div className="w-full max-w-2xl rounded-3xl bg-white/70 p-10 text-center text-ink/60 shadow-soft animate-fade-in">
+      <div className="w-full max-w-2xl min-h-[200px] rounded-3xl bg-white/70 p-10 text-center text-ink/60 shadow-soft animate-fade-in">
         Preparing a measured roast.
       </div>
     );

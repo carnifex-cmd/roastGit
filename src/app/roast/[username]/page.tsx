@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { RoastFlow } from "@/components/RoastFlow";
 import { BackButton } from "@/components/BackButton";
 import { RoastJsonLd } from "@/components/JsonLd";
+import { getRoast } from "@/lib/roast";
+import type { RoastOutput } from "@/lib/types";
 
 type Props = {
   params: { username: string };
@@ -28,7 +30,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function RoastPage({ params }: Props) {
+export default async function RoastPage({ params }: Props) {
+  let roastData: RoastOutput | null = null;
+
+  try {
+    roastData = await getRoast(params.username);
+  } catch {
+    // Server-side fetch failed — RoastFlow will fallback to client-side fetch
+  }
+
   return (
     <main className="min-h-screen bg-paper px-6 py-16">
       <BackButton />
@@ -42,9 +52,25 @@ export default function RoastPage({ params }: Props) {
             @{params.username}
           </p>
         </header>
-        <RoastFlow username={params.username} />
+
+        {/* SSR content for crawlers — hidden from visual users */}
+        {roastData && (
+          <div className="sr-only">
+            {roastData.messages.map((msg, i) => (
+              <p key={i}>{msg}</p>
+            ))}
+            <p>{roastData.summary.verdict}</p>
+            <p>Profile Score: {roastData.summary.profileScore}/10</p>
+          </div>
+        )}
+
+        <RoastFlow username={params.username} initialData={roastData} />
       </article>
-      <RoastJsonLd username={params.username} />
+      <RoastJsonLd
+        username={params.username}
+        score={roastData?.summary.profileScore}
+        verdict={roastData?.summary.verdict}
+      />
     </main>
   );
 }
