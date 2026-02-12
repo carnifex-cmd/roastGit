@@ -6,18 +6,22 @@ import { FAQSection } from "@/components/FAQSection";
 import { SecondaryCTA } from "@/components/SecondaryCTA";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { HomeJsonLd } from "@/components/JsonLd";
 
 export default function HomePage() {
   return (
     <>
       <Navbar />
-      <LandingHero />
-      <FeaturesSection />
-      <HowItWorks />
-      <ExampleRoast />
-      <FAQSection />
-      <SecondaryCTA />
+      <main>
+        <LandingHero />
+        <FeaturesSection />
+        <HowItWorks />
+        <ExampleRoast />
+        <FAQSection />
+        <SecondaryCTA />
+      </main>
       <Footer />
+      <HomeJsonLd />
     </>
   );
 }

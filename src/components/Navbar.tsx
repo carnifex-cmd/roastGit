@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function Navbar() {
     return (
-        <nav className="fixed left-0 right-0 top-0 z-50 px-6 py-4">
+        <nav aria-label="Main navigation" className="fixed left-0 right-0 top-0 z-50 px-6 py-4">
             <div className="mx-auto flex max-w-5xl items-center justify-between">
                 <Link
                     href="/"
