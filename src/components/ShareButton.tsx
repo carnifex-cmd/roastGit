@@ -10,7 +10,6 @@ type ShareButtonProps = {
 
 function formatRoastReport(username: string, summary: RoastSummary): string {
     return [
-        `@${username}'s GitHub Roast Report`,
         ``,
         `Observation`,
         summary.observation,
@@ -44,7 +43,7 @@ export function ShareButton({ username, summary }: ShareButtonProps) {
         if (typeof navigator !== "undefined" && navigator.share) {
             try {
                 await navigator.share({
-                    title: `@${username}'s GitHub Roast`,
+                    title: `@${username}'s GitHub Roast Report`,
                     text: shareText,
                 });
                 return;
