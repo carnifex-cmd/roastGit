@@ -2,7 +2,7 @@ import { getAIClient } from "@/ai";
 import { getProfile, getRecentComments, getRecentCommits, getRecentRepos } from "@/lib/github";
 import { buildSummary } from "@/lib/roastSummary";
 import type { GitHubComment, GitHubCommit, GitHubRepo, RoastOutput } from "@/lib/types";
-import { getCache, setCache } from "@/lib/cache";
+import { getCache, setCache, trackRoast } from "@/lib/cache";
 import { truncate } from "@/lib/utils";
 
 const CACHE_TTL_MS = 7 * 60 * 1000;
@@ -93,5 +93,6 @@ export async function getRoast(username: string): Promise<RoastOutput> {
   };
 
   setCache(cacheKey, output, CACHE_TTL_MS);
+  trackRoast(profile.login);
   return output;
 }

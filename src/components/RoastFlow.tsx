@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import type { RoastOutput } from "@/lib/types";
 import { RoastSummaryCard } from "@/components/RoastSummaryCard";
+import { ShareButton } from "@/components/ShareButton";
 
 const replySets = [
   ["Okay, go on", "Go ahead"],
@@ -215,6 +216,9 @@ export function RoastFlow({ username, initialData }: RoastFlowProps) {
       {showSummary && (
         <div className="animate-fade-in">
           <RoastSummaryCard summary={data.summary} />
+          <div className="mt-6 flex justify-center">
+            <ShareButton username={username} />
+          </div>
         </div>
       )}
     </div>
