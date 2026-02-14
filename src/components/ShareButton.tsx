@@ -1,12 +1,43 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import type { RoastSummary } from "@/lib/types";
 
-export function ShareButton({ username }: { username: string }) {
+type ShareButtonProps = {
+    username: string;
+    summary: RoastSummary;
+};
+
+function formatRoastReport(username: string, summary: RoastSummary): string {
+    return [
+        `@${username}'s GitHub Roast Report`,
+        ``,
+        `Observation`,
+        summary.observation,
+        ``,
+        `Pattern Noticed`,
+        summary.patternNoticed,
+        ``,
+        `How This Reads Publicly`,
+        summary.publicPerception,
+        ``,
+        `What It Adds Up To`,
+        summary.verdict,
+        ``,
+        `Profile Score: ${summary.profileScore}/100`,
+        ``,
+        `Final Line`,
+        summary.finalLine,
+        ``,
+        `—`,
+        `Get yours at roastgit.in`,
+    ].join("\n");
+}
+
+export function ShareButton({ username, summary }: ShareButtonProps) {
     const [copied, setCopied] = useState(false);
 
-    const shareUrl = `https://roastgit.in/roast/${username}`;
-    const shareText = `Check out my GitHub profile roast on RoastGit! 🔥`;
+    const shareText = formatRoastReport(username, summary);
 
     const handleShare = useCallback(async () => {
         // Use native share API if available (mobile)
@@ -15,7 +46,6 @@ export function ShareButton({ username }: { username: string }) {
                 await navigator.share({
                     title: `@${username}'s GitHub Roast`,
                     text: shareText,
-                    url: shareUrl,
                 });
                 return;
             } catch {
@@ -25,13 +55,13 @@ export function ShareButton({ username }: { username: string }) {
 
         // Fallback: copy to clipboard
         try {
-            await navigator.clipboard.writeText(shareUrl);
+            await navigator.clipboard.writeText(shareText);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
             // Clipboard API not available
         }
-    }, [username, shareUrl, shareText]);
+    }, [username, shareText]);
 
     return (
         <button

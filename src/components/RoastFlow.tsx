@@ -217,7 +217,7 @@ export function RoastFlow({ username, initialData }: RoastFlowProps) {
         <div className="animate-fade-in">
           <RoastSummaryCard summary={data.summary} />
           <div className="mt-6 flex justify-center">
-            <ShareButton username={username} />
+            <ShareButton username={username} summary={data.summary} />
           </div>
         </div>
       )}
