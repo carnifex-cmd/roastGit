@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 import { WebVitals } from "@/components/WebVitals";
+import { Analytics } from "@vercel/analytics/next";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -76,6 +77,7 @@ export default function RootLayout({
       <body className="antialiased">
         <WebVitals />
         <div className="min-h-screen">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
