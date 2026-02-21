@@ -13,7 +13,7 @@ const instrumentSans = Instrument_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://roastgit.in"),
   title: {
-    default: "RoastGit — AI-Powered GitHub Profile Roasts | Free Developer Tool",
+    default: "RoastGit | AI-Powered GitHub Profile Roasts | Free Developer Tool",
     template: "%s | RoastGit",
   },
   description:
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://roastgit.in",
     siteName: "RoastGit",
-    title: "RoastGit — AI-Powered GitHub Profile Roasts",
+    title: "RoastGit | AI-Powered GitHub Profile Roasts",
     description:
       "Get an honest AI roast of your GitHub profile. Repos, commits, and activity analyzed.",
     images: [
@@ -43,13 +43,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "RoastGit — AI-Powered GitHub Profile Roasts",
+        alt: "RoastGit | AI-Powered GitHub Profile Roasts",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "RoastGit — AI-Powered GitHub Profile Roasts",
+    title: "RoastGit | AI-Powered GitHub Profile Roasts",
     description: "Get your GitHub honestly reviewed by AI.",
     images: ["/og-image.png"],
   },
