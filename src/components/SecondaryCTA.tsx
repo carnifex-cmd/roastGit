@@ -20,7 +20,11 @@ export function SecondaryCTA() {
                 </p>
                 <form onSubmit={handleSubmit} className="w-full max-w-md">
                     <div className="flex flex-col gap-3">
+                        <label htmlFor="secondary-username" className="sr-only">
+                            GitHub Username
+                        </label>
                         <input
+                            id="secondary-username"
                             value={value}
                             onChange={(event) => setValue(event.target.value)}
                             onBlur={() => setTouched(true)}

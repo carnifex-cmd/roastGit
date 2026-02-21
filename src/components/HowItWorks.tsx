@@ -8,7 +8,7 @@ export function HowItWorks() {
     return (
         <section id="how-it-works" className="px-6 py-16">
             <div className="mx-auto flex max-w-xl flex-col items-center gap-6">
-                <p className="text-micro uppercase text-ink/50">How it works</p>
+                <h2 className="text-micro uppercase text-ink/50">How the GitHub roast works</h2>
                 <ol className="flex flex-col gap-5">
                     {steps.map((step, index) => (
                         <li key={index} className="flex items-baseline gap-3">

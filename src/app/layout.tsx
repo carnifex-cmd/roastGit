@@ -13,7 +13,7 @@ const instrumentSans = Instrument_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://roastgit.in"),
   title: {
-    default: "RoastGit — AI-Powered GitHub Profile Roasts",
+    default: "RoastGit — AI-Powered GitHub Profile Roasts | Free Developer Tool",
     template: "%s | RoastGit",
   },
   description:

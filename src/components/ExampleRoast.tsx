@@ -7,7 +7,7 @@ export function ExampleRoast() {
     return (
         <section className="px-6 py-24">
             <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-                <p className="text-micro uppercase text-ink/40">Example</p>
+                <h2 className="text-micro uppercase text-ink/40">Example GitHub roast</h2>
                 <div className="w-full rounded-2xl bg-white/60 p-8 shadow-soft">
                     <div className="flex flex-col gap-4">
                         {exampleLines.map((line, index) => (

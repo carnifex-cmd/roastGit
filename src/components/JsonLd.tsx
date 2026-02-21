@@ -1,31 +1,4 @@
-
-
-const faqs = [
-    {
-        question: "Is this private?",
-        answer:
-            "Only your public GitHub data is accessed. Nothing hidden, nothing private.",
-    },
-    {
-        question: "What data do you access?",
-        answer:
-            "Public repos, commits, and profile information. The same things anyone can see.",
-    },
-    {
-        question: "Is anything stored?",
-        answer:
-            "Nothing. We don't keep any data after your roast is generated.",
-    },
-    {
-        question: "Is this free?",
-        answer: "Completely. No accounts, no payments, no catch.",
-    },
-    {
-        question: "Can it be offensive?",
-        answer:
-            "We try to keep it light. If it stings, that's the point — but never cruel.",
-    },
-];
+import { faqs } from "@/lib/faq";
 
 export function HomeJsonLd() {
     const data = {
@@ -44,6 +17,10 @@ export function HomeJsonLd() {
                     price: "0",
                     priceCurrency: "USD",
                 },
+                sameAs: [
+                    "https://x.com/shxrdexe",
+                    "https://github.com/carnifex-cmd/roastGit",
+                ],
             },
             {
                 "@type": "FAQPage",

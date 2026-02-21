@@ -9,10 +9,10 @@ export function LandingHero() {
             RoastGit
           </p>
           <h1 className="text-headline font-semibold tracking-tightish sm:text-display">
-            Your GitHub. Honestly reviewed.
+            Roast any GitHub profile with AI
           </h1>
           <p className="text-body text-ink/70">
-            We analyze your public GitHub activity and roast it with restraint.
+            Enter any username. Get an honest, AI-generated roast of their repos, commits, and coding patterns.
           </p>
         </header>
         <UsernameForm />

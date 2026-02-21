@@ -46,11 +46,8 @@ export default async function RoastPage({ params }: Props) {
         <header className="text-center">
           <p className="text-micro uppercase text-ink/50">RoastGit</p>
           <h1 className="mt-4 text-headline font-semibold tracking-tightish">
-            Roast report
+            @{params.username}&apos;s GitHub Roast
           </h1>
-          <p className="mt-2 text-sm text-ink/60">
-            @{params.username}
-          </p>
         </header>
 
         {/* SSR content for crawlers — hidden from visual users */}

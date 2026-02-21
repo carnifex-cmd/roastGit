@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { LandingHero } from "@/components/LandingHero";
 import { FeaturesSection } from "@/components/FeaturesSection";
+import { SEODescription } from "@/components/SEODescription";
 import { HowItWorks } from "@/components/HowItWorks";
 import { ExampleRoast } from "@/components/ExampleRoast";
 import { Footer } from "@/components/Footer";
@@ -23,6 +24,7 @@ export default function HomePage() {
       <Navbar />
       <main>
         <LandingHero />
+        <SEODescription />
         <FeaturesSection />
         <HowItWorks />
         <ExampleRoast />
