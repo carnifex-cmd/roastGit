@@ -2,6 +2,7 @@ import type { AIClient } from "@/ai/AIClient";
 import { MockAIClient } from "@/ai/MockAIClient";
 import { OpenAIProvider } from "@/ai/providers/OpenAIProvider";
 import { PerplexityProvider } from "@/ai/providers/PerplexityProvider";
+import { GroqProvider } from "@/ai/providers/GroqProvider";
 
 const provider = process.env.AI_PROVIDER ?? "mock";
 
@@ -11,6 +12,8 @@ export function getAIClient(): AIClient {
       return new OpenAIProvider();
     case "perplexity":
       return new PerplexityProvider();
+    case "groq":
+      return new GroqProvider();
     case "mock":
     default:
       return new MockAIClient();
