@@ -32,7 +32,16 @@ The JSON must contain:
 3. "patternNoticed": What pattern the roasts revealed about this profile. Observational, slightly cutting.
 4. "publicPerception": How this profile reads to a stranger looking at it. Honest, uncomfortable if warranted.
 5. "verdict": The final judgment of what it all adds up to. Conclusive, no padding.
-6. "profileScore": Integer 0-100 rating how this GitHub profile comes across to a stranger. Be harsh. High effort ≠ high score. Confusing/sparse profiles score lower. Clear/intentional profiles may score higher. This is subjective judgment, not a metric.
+6. "profileScore": "profileScore": Integer 0-100. Score the profile objectively — 
+independent of the roast tone. A profile can be funny to roast and 
+still deserve a high score. Use this rubric:
+  0-20:  Essentially empty. No repos, no bio, no activity.
+  21-40: Minimal presence. A few repos, little signal.
+  41-60: Average developer. Active but unfocused or incomplete.
+  61-80: Solid presence. Clear intent, consistent work, good signal.
+  81-100: Standout profile. Well-curated, impressive output, strong identity.
+Score what you objectively see, not what you're roasting.
+
 7. "finalLine": Exactly one sentence. The closing punch. Derived from your roasts. Dry, clever, screenshot-worthy. NOT a compliment.
 
 Example output structure:
