@@ -1,4 +1,4 @@
-import type { RoastInput } from "@/lib/types";
+import type { ComparisonAIInput, ComparisonAIResult, RoastInput } from "@/lib/types";
 
 export type RoastResult = {
   messages: string[];
@@ -12,4 +12,5 @@ export type RoastResult = {
 
 export interface AIClient {
   generateRoast(input: RoastInput): Promise<RoastResult>;
+  generateComparison(input: ComparisonAIInput): Promise<ComparisonAIResult>;
 }

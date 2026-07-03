@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-
-const usernamePattern = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
+import { isValidGitHubUsername } from "@/lib/githubUsername";
 
 export function useUsernameInput() {
     const router = useRouter();
@@ -11,7 +10,7 @@ export function useUsernameInput() {
     const [touched, setTouched] = useState(false);
 
     const trimmed = value.trim();
-    const isValid = useMemo(() => usernamePattern.test(trimmed), [trimmed]);
+    const isValid = useMemo(() => isValidGitHubUsername(trimmed), [trimmed]);
     const showError = touched && trimmed.length > 0 && !isValid;
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

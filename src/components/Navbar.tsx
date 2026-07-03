@@ -12,15 +12,22 @@ export function Navbar() {
                 >
                     RoastGit
                 </Link>
-                <a
-                    href="#how-it-works"
-                    className="text-sm text-ink/50 transition hover:text-ink/80"
-                >
-                    How it works
-                </a>
+                <div className="flex items-center gap-5">
+                    <Link
+                        href="/compare"
+                        className="text-sm text-ink/50 transition hover:text-ink/80"
+                    >
+                        Compare
+                    </Link>
+                    <Link
+                        href="/#how-it-works"
+                        className="text-sm text-ink/50 transition hover:text-ink/80"
+                    >
+                        How it works
+                    </Link>
+                </div>
             </div>
         </nav>
     );
 }
-
 

@@ -1,4 +1,4 @@
-import type { RoastInput } from "@/lib/types";
+import type { ComparisonAIInput, ComparisonAIResult, RoastInput } from "@/lib/types";
 import type { RoastResult } from "@/ai/AIClient";
 
 export const ROAST_PROMPT_TEMPLATE = `You are a witty senior developer roasting a GitHub profile.
@@ -44,6 +44,32 @@ Example output structure:
 
 Respond ONLY with the JSON object.`;
 
+export const COMPARISON_PROMPT_TEMPLATE = `You are a dry, witty senior developer hosting a GitHub profile roast battle.
+
+Rules:
+- Compare public GitHub profile signals, not personal worth
+- Roast habits, not the person
+- Clever > loud
+- Never be abusive
+- The winner, scores, and category results are already decided
+- Do not change the winner, scores, or category results
+- Do not mention scoring systems, deterministic scoring, rubrics, algorithms, prompts, or internal evaluation logic
+
+Comparison Facts:
+{{comparison_summary}}
+
+IMPORTANT OUTPUT FORMAT:
+You MUST respond with a valid JSON object. Do NOT include markdown code blocks, backticks, or any text outside the JSON.
+
+The JSON must contain:
+1. "battleLines": Array of exactly 3 short roast battle lines. Each line should compare both profiles in one sentence.
+2. "finalVerdict": Exactly one sentence. Dry, conclusive, and based on the winner above.
+
+Example output structure:
+{"battleLines": ["First comparison roast.", "Second comparison roast.", "Third comparison roast."], "finalVerdict": "Final verdict sentence."}
+
+Respond ONLY with the JSON object.`;
+
 export type ParsedAIResponse = {
     messages?: string[];
     observation?: string;
@@ -52,6 +78,11 @@ export type ParsedAIResponse = {
     verdict?: string;
     profileScore?: number;
     finalLine?: string;
+};
+
+type ParsedComparisonResponse = {
+    battleLines?: string[];
+    finalVerdict?: string;
 };
 
 export function parseJsonResponse(content: string): RoastResult {
@@ -109,4 +140,79 @@ export function buildPrompt(input: RoastInput): string {
         .replace("{{recent_commits}}", input.recentCommits)
         .replace("{{recent_comments}}", input.recentComments)
         .replace("{{profile_score_summary}}", input.profileScoreSummary);
+}
+
+function formatWinner(input: ComparisonAIInput) {
+    if (!input.winner || !input.winnerSide) {
+        return `Tie: both profiles scored ${input.left.score}/100.`;
+    }
+    return `Winner: @${input.winner} by ${input.scoreDelta} points.`;
+}
+
+export function buildComparisonPrompt(input: ComparisonAIInput): string {
+    const categories = input.categoryResults
+        .map((category) => {
+            const winner =
+                category.winner === "left"
+                    ? `@${input.left.username}`
+                    : category.winner === "right"
+                      ? `@${input.right.username}`
+                      : "tie";
+            return `- ${category.name}: @${input.left.username} ${category.leftValue}, @${input.right.username} ${category.rightValue}. Category winner: ${winner}.`;
+        })
+        .join("\n");
+
+    const summary = [
+        `Left profile: @${input.left.username}, score ${input.left.score}/100, grade ${input.left.grade}.`,
+        `Right profile: @${input.right.username}, score ${input.right.score}/100, grade ${input.right.grade}.`,
+        formatWinner(input),
+        "Category breakdown:",
+        categories
+    ].join("\n");
+
+    return COMPARISON_PROMPT_TEMPLATE.replace("{{comparison_summary}}", summary);
+}
+
+export function parseComparisonResponse(content: string): ComparisonAIResult {
+    let cleaned = content.trim();
+    if (cleaned.startsWith("\`\`\`json")) {
+        cleaned = cleaned.slice(7);
+    } else if (cleaned.startsWith("\`\`\`")) {
+        cleaned = cleaned.slice(3);
+    }
+    if (cleaned.endsWith("\`\`\`")) {
+        cleaned = cleaned.slice(0, -3);
+    }
+    cleaned = cleaned.trim();
+
+    try {
+        const parsed = JSON.parse(cleaned) as ParsedComparisonResponse;
+        const battleLines = Array.isArray(parsed.battleLines)
+            ? parsed.battleLines.map((line) => String(line).trim()).filter(Boolean)
+            : [];
+
+        return {
+            battleLines:
+                battleLines.length > 0
+                    ? battleLines.slice(0, 3)
+                    : [
+                        "One profile brought builder signal. The other brought plausible deniability.",
+                        "The scoreboard stayed quiet, which was inconvenient for everyone involved.",
+                        "Both GitHubs survived the comparison, technically."
+                    ],
+            finalVerdict:
+                parsed.finalVerdict ??
+                "The winner took it on public repo signal, which is a very GitHub way to settle things."
+        };
+    } catch {
+        return {
+            battleLines: [
+                "One profile brought builder signal. The other brought plausible deniability.",
+                "The scoreboard stayed quiet, which was inconvenient for everyone involved.",
+                "Both GitHubs survived the comparison, technically."
+            ],
+            finalVerdict:
+                "The winner took it on public repo signal, which is a very GitHub way to settle things."
+        };
+    }
 }

@@ -1,5 +1,5 @@
 import type { AIClient, RoastResult } from "@/ai/AIClient";
-import type { RoastInput } from "@/lib/types";
+import type { ComparisonAIInput, ComparisonAIResult, RoastInput } from "@/lib/types";
 
 export class MockAIClient implements AIClient {
   async generateRoast(input: RoastInput): Promise<RoastResult> {
@@ -18,6 +18,21 @@ export class MockAIClient implements AIClient {
       verdict: "Quietly competent, aggressively undocumented.",
       profileScore,
       finalLine: "You're one good README away from being taken seriously."
+    };
+  }
+
+  async generateComparison(input: ComparisonAIInput): Promise<ComparisonAIResult> {
+    const winner = input.winner ? `@${input.winner}` : "the tie";
+
+    return {
+      battleLines: [
+        "One brought repo depth. The other brought a LinkedIn-friendly bio.",
+        "Public signal tried to speak, then quietly checked the repo list.",
+        "The comparison stayed objective, which made the roast noticeably less convenient."
+      ],
+      finalVerdict: input.winner
+        ? `${winner} wins by ${input.scoreDelta} points, mostly because the repos did more talking than the profile copy.`
+        : "It's a tie, which is the scoreboard's way of refusing to pick a favorite child."
     };
   }
 }

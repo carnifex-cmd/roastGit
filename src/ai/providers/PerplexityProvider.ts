@@ -1,7 +1,12 @@
 import Perplexity from "@perplexity-ai/perplexity_ai";
 import type { AIClient, RoastResult } from "@/ai/AIClient";
-import type { RoastInput } from "@/lib/types";
-import { buildPrompt, parseJsonResponse } from "@/ai/shared";
+import type { ComparisonAIInput, ComparisonAIResult, RoastInput } from "@/lib/types";
+import {
+    buildComparisonPrompt,
+    buildPrompt,
+    parseComparisonResponse,
+    parseJsonResponse
+} from "@/ai/shared";
 
 const VALID_MODELS = [
     "sonar-pro",
@@ -47,5 +52,30 @@ export class PerplexityProvider implements AIClient {
         }
 
         return parseJsonResponse(content);
+    }
+
+    async generateComparison(input: ComparisonAIInput): Promise<ComparisonAIResult> {
+        const prompt = buildComparisonPrompt(input);
+
+        const apiKey = process.env.PERPLEXITY_API_KEY;
+        if (!apiKey) {
+            throw new Error("Missing PERPLEXITY_API_KEY environment variable.");
+        }
+
+        const client = new Perplexity();
+        const modelName = getValidatedModel();
+        const completion = (await client.chat.completions.create({
+            model: modelName,
+            messages: [{ role: "user", content: prompt }]
+        })) as {
+            choices?: { message?: { content?: string } }[];
+        };
+
+        const content = completion.choices?.[0]?.message?.content?.trim();
+        if (!content) {
+            throw new Error("Perplexity returned an empty response.");
+        }
+
+        return parseComparisonResponse(content);
     }
 }

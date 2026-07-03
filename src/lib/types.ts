@@ -48,6 +48,43 @@ export type RoastOutput = {
   generatedAt: string;
 };
 
+export type CompareSide = "left" | "right";
+
+export type ComparedProfile = {
+  username: string;
+  score: number;
+  grade: ProfileScoreGrade;
+  breakdown: ProfileScoreBreakdown;
+  scorerVersion: string;
+};
+
+export type ComparisonCategoryResult = {
+  key: keyof ProfileScoreBreakdown;
+  name: string;
+  leftValue: number;
+  rightValue: number;
+  winner: CompareSide | null;
+};
+
+export type ComparisonAIInput = {
+  left: ComparedProfile;
+  right: ComparedProfile;
+  winner: string | null;
+  winnerSide: CompareSide | null;
+  scoreDelta: number;
+  categoryResults: ComparisonCategoryResult[];
+};
+
+export type ComparisonAIResult = {
+  battleLines: string[];
+  finalVerdict: string;
+};
+
+export type ComparisonOutput = ComparisonAIInput &
+  ComparisonAIResult & {
+    generatedAt: string;
+  };
+
 export type GitHubProfile = {
   login: string;
   name: string | null;
