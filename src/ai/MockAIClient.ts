@@ -2,7 +2,10 @@ import type { AIClient, RoastResult } from "@/ai/AIClient";
 import type { RoastInput } from "@/lib/types";
 
 export class MockAIClient implements AIClient {
-  async generateRoast(_input: RoastInput): Promise<RoastResult> {
+  async generateRoast(input: RoastInput): Promise<RoastResult> {
+    const scoreMatch = input.profileScoreSummary.match(/profile score: (\d+)\/100/i);
+    const profileScore = scoreMatch ? Number(scoreMatch[1]) : 62;
+
     return {
       messages: [
         "Your commit history reads like a minimalist novel—short, intentional, and a little quiet.",
@@ -13,7 +16,7 @@ export class MockAIClient implements AIClient {
       patternNoticed: "Weekend warrior commits suggest a 9-to-5 that doesn't know about your side quests.",
       publicPerception: "Your GitHub says 'I build things' but the README says 'figure it out yourself.'",
       verdict: "Quietly competent, aggressively undocumented.",
-      profileScore: 62,
+      profileScore,
       finalLine: "You're one good README away from being taken seriously."
     };
   }

@@ -46,8 +46,13 @@ export function RoastSummaryCard({ summary }: { summary: RoastSummary }) {
               Profile Score
             </p>
             <p className="mt-2 text-3xl font-semibold text-ink">
-              {summary.profileScore}
+              {summary.profileScore}/100
             </p>
+            {summary.profileScoreGrade && (
+              <p className="mt-1 text-xs uppercase tracking-[0.15em] text-ink/45">
+                {summary.profileScoreGrade}
+              </p>
+            )}
           </div>
           <div className="max-w-sm">
             <p className="text-micro uppercase text-ink/50">

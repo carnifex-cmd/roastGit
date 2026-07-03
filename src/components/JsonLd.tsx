@@ -70,12 +70,12 @@ export function RoastJsonLd({
                     url: `https://github.com/${username}`,
                     name: `${username}'s GitHub Profile`,
                 },
-                ...(score && {
+                ...(score !== undefined && {
                     reviewRating: {
                         "@type": "Rating",
                         ratingValue: score,
-                        bestRating: 10,
-                        worstRating: 1,
+                        bestRating: 100,
+                        worstRating: 0,
                     },
                 }),
             },

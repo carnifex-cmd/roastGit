@@ -3,7 +3,30 @@ export type RoastInput = {
   recentRepos: string;
   recentCommits: string;
   recentComments: string;
+  profileScoreSummary: string;
   stage: "opening" | "reply" | "final";
+};
+
+export type ProfileScoreGrade =
+  | "Empty"
+  | "Minimal"
+  | "Average"
+  | "Solid"
+  | "Standout";
+
+export type ProfileScoreBreakdown = {
+  profileCompleteness: number;
+  repositoryPortfolio: number;
+  activity: number;
+  publicSignal: number;
+  presentationQuality: number;
+};
+
+export type ProfileScore = {
+  score: number;
+  grade: ProfileScoreGrade;
+  breakdown: ProfileScoreBreakdown;
+  scorerVersion: string;
 };
 
 export type RoastSummary = {
@@ -12,6 +35,9 @@ export type RoastSummary = {
   publicPerception: string;
   verdict: string;
   profileScore: number;
+  profileScoreGrade?: ProfileScoreGrade;
+  profileScoreBreakdown?: ProfileScoreBreakdown;
+  profileScoreVersion?: string;
   finalLine: string;
 };
 
@@ -39,6 +65,7 @@ export type GitHubRepo = {
   description: string | null;
   updated_at: string;
   stargazers_count: number;
+  forks_count?: number;
   language: string | null;
   fork: boolean;
 };

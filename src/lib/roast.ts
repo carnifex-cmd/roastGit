@@ -1,11 +1,14 @@
 import { getAIClient } from "@/ai";
 import { getProfile, getRecentComments, getRecentCommits, getRecentRepos } from "@/lib/github";
+import { calculateProfileScore, formatProfileScore } from "@/lib/profileScore";
 import { buildSummary } from "@/lib/roastSummary";
 import type { GitHubComment, GitHubCommit, GitHubRepo, RoastOutput } from "@/lib/types";
 import { getCache, setCache, trackRoast } from "@/lib/cache";
 import { truncate } from "@/lib/utils";
 
 const CACHE_TTL_MS = 7 * 60 * 1000;
+const REPO_SAMPLE_LIMIT = 20;
+const COMMIT_SAMPLE_LIMIT = 20;
 
 function formatProfileSummary(profile: Awaited<ReturnType<typeof getProfile>>) {
   return [
@@ -54,7 +57,7 @@ export async function getRoast(username: string): Promise<RoastOutput> {
 
   // Fetch repos, comments with resilience - these can fail without breaking the roast
   const [reposResult, commentsResult] = await Promise.allSettled([
-    getRecentRepos(username, 5),
+    getRecentRepos(username, REPO_SAMPLE_LIMIT),
     getRecentComments(username, 5)
   ]);
 
@@ -65,11 +68,18 @@ export async function getRoast(username: string): Promise<RoastOutput> {
   let commits: GitHubCommit[] = [];
   if (repos.length > 0) {
     try {
-      commits = await getRecentCommits(username, repos, 10);
+      commits = await getRecentCommits(username, repos, COMMIT_SAMPLE_LIMIT);
     } catch {
       // Commits fetch failed, proceed without them
     }
   }
+
+  const profileScore = calculateProfileScore({
+    profile,
+    repos,
+    commits,
+    comments
+  });
 
   const aiClient = getAIClient();
   const roastResult = await aiClient.generateRoast({
@@ -77,13 +87,14 @@ export async function getRoast(username: string): Promise<RoastOutput> {
     recentRepos: formatRepos(repos),
     recentCommits: formatCommits(commits),
     recentComments: formatComments(comments),
+    profileScoreSummary: formatProfileScore(profileScore),
     stage: "final"
   });
 
   // Use messages directly from AI client (already structured)
   const messages = roastResult.messages;
 
-  const summary = buildSummary(roastResult);
+  const summary = buildSummary(roastResult, profileScore);
 
   const output: RoastOutput = {
     username: profile.login,

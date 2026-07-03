@@ -57,7 +57,7 @@ export default async function RoastPage({ params }: Props) {
               <p key={i}>{msg}</p>
             ))}
             <p>{roastData.summary.verdict}</p>
-            <p>Profile Score: {roastData.summary.profileScore}/10</p>
+            <p>Profile Score: {roastData.summary.profileScore}/100</p>
           </div>
         )}
 
@@ -71,6 +71,5 @@ export default async function RoastPage({ params }: Props) {
     </main>
   );
 }
-
 
 

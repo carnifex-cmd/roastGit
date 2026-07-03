@@ -23,6 +23,9 @@ Recent Commits (summarized):
 Recent Comments (if any):
 {{recent_comments}}
 
+Deterministic Profile Score:
+{{profile_score_summary}}
+
 IMPORTANT OUTPUT FORMAT:
 You MUST respond with a valid JSON object. Do NOT include markdown code blocks, backticks, or any text outside the JSON.
 
@@ -32,15 +35,7 @@ The JSON must contain:
 3. "patternNoticed": What pattern the roasts revealed about this profile. Observational, slightly cutting.
 4. "publicPerception": How this profile reads to a stranger looking at it. Honest, uncomfortable if warranted.
 5. "verdict": The final judgment of what it all adds up to. Conclusive, no padding.
-6. "profileScore": "profileScore": Integer 0-100. Score the profile objectively — 
-independent of the roast tone. A profile can be funny to roast and 
-still deserve a high score. Use this rubric:
-  0-20:  Essentially empty. No repos, no bio, no activity.
-  21-40: Minimal presence. A few repos, little signal.
-  41-60: Average developer. Active but unfocused or incomplete.
-  61-80: Solid presence. Clear intent, consistent work, good signal.
-  81-100: Standout profile. Well-curated, impressive output, strong identity.
-Score what you objectively see, not what you're roasting.
+6. "profileScore": Copy the deterministic profile score exactly. Do not invent, adjust, or reinterpret this number.
 
 7. "finalLine": Exactly one sentence. The closing punch. Derived from your roasts. Dry, clever, screenshot-worthy. NOT a compliment.
 
@@ -112,5 +107,6 @@ export function buildPrompt(input: RoastInput): string {
         .replace("{{profile_summary}}", input.profileSummary)
         .replace("{{recent_repos}}", input.recentRepos)
         .replace("{{recent_commits}}", input.recentCommits)
-        .replace("{{recent_comments}}", input.recentComments);
+        .replace("{{recent_comments}}", input.recentComments)
+        .replace("{{profile_score_summary}}", input.profileScoreSummary);
 }
