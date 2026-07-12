@@ -7,6 +7,7 @@ import { ExampleRoast } from "@/components/ExampleRoast";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { HomeJsonLd } from "@/components/JsonLd";
+import { CompareCTA } from "@/components/CompareCTA";
 
 const FAQSection = dynamic(
   () => import("@/components/FAQSection").then((mod) => mod.FAQSection),
@@ -26,6 +27,7 @@ export default function HomePage() {
         <LandingHero />
         <SEODescription />
         <FeaturesSection />
+        <CompareCTA />
         <HowItWorks />
         <ExampleRoast />
         <FAQSection />
@@ -36,4 +38,3 @@ export default function HomePage() {
     </>
   );
 }
-

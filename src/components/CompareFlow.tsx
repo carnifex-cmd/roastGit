@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ComparisonCategoryResult, ComparisonOutput, CompareSide } from "@/lib/types";
 import { isValidGitHubUsername } from "@/lib/githubUsername";
 
@@ -63,6 +63,43 @@ function animationDelay(ms: number) {
   return { animationDelay: `${ms}ms` };
 }
 
+function barAnimationStyle(width: string, delayMs: number) {
+  return {
+    width,
+    transform: "scaleX(0)",
+    animation: `compareBarSweep 900ms cubic-bezier(0.22, 1, 0.36, 1) ${delayMs}ms forwards`
+  };
+}
+
+function comparisonPath(data: ComparisonOutput) {
+  return `/compare/${data.left.username.toLowerCase()}/${data.right.username.toLowerCase()}`;
+}
+
+function formatBattleReport(data: ComparisonOutput, url: string) {
+  const winnerLine = data.winner
+    ? `@${data.winner} by ${data.scoreDelta} points`
+    : "Tie";
+
+  return [
+    `GITHUB ROAST BATTLE`,
+    ``,
+    `@${data.left.username} vs @${data.right.username}`,
+    ``,
+    `WINNER`,
+    winnerLine,
+    ``,
+    `SCORE`,
+    `@${data.left.username}: ${data.left.score}/100`,
+    `@${data.right.username}: ${data.right.score}/100`,
+    ``,
+    `FINAL VERDICT`,
+    data.finalVerdict,
+    ``,
+    `-`,
+    `See the battle at ${url}`
+  ].join("\n");
+}
+
 function AnimatedScore({ value, delayMs }: { value: number; delayMs: number }) {
   const [displayValue, setDisplayValue] = useState(0);
 
@@ -92,14 +129,112 @@ function AnimatedScore({ value, delayMs }: { value: number; delayMs: number }) {
   return <>{displayValue}/100</>;
 }
 
-export function CompareFlow() {
-  const [leftUsername, setLeftUsername] = useState("");
-  const [rightUsername, setRightUsername] = useState("");
+function CompareShareButton({ data }: { data: ComparisonOutput }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(async () => {
+    const path = comparisonPath(data);
+    const url = `${window.location.origin}${path}`;
+    const shareText = formatBattleReport(data, url);
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "GitHub Roast Battle",
+          text: shareText,
+          url
+        });
+        return;
+      } catch {
+        // User cancelled or share failed; fall through to clipboard.
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API not available.
+    }
+  }, [data]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleShare}
+      className="inline-flex items-center gap-2 rounded-full bg-ink/5 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-ink/60 ring-1 ring-ink/10 transition hover:bg-ink/10 hover:text-ink/80"
+    >
+      {copied ? (
+        <>
+          <CheckIcon />
+          Copied!
+        </>
+      ) : (
+        <>
+          <ShareIcon />
+          Share battle
+        </>
+      )}
+    </button>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <polyline points="16 6 12 2 8 6" />
+      <line x1="12" y1="2" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+type CompareFlowProps = {
+  initialLeftUsername?: string;
+  initialRightUsername?: string;
+  autoRun?: boolean;
+};
+
+export function CompareFlow({
+  initialLeftUsername = "",
+  initialRightUsername = "",
+  autoRun = false
+}: CompareFlowProps) {
+  const [leftUsername, setLeftUsername] = useState(initialLeftUsername);
+  const [rightUsername, setRightUsername] = useState(initialRightUsername);
   const [leftTouched, setLeftTouched] = useState(false);
   const [rightTouched, setRightTouched] = useState(false);
   const [data, setData] = useState<ComparisonOutput | null>(null);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
   const [loading, setLoading] = useState(false);
+  const autoRunStarted = useRef(false);
 
   const left = leftUsername.trim();
   const right = rightUsername.trim();
@@ -113,8 +248,7 @@ export function CompareFlow() {
     [data]
   );
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const runComparison = useCallback(async () => {
     setLeftTouched(true);
     setRightTouched(true);
     if (!formValid) return;
@@ -136,12 +270,27 @@ export function CompareFlow() {
         return;
       }
 
+      const path = comparisonPath(payload);
+      if (window.location.pathname !== path) {
+        window.history.pushState(null, "", path);
+      }
       setData(payload);
     } catch {
       setErrorInfo(getError(null, "Connection issue. Check your network and try again."));
     } finally {
       setLoading(false);
     }
+  }, [formValid, left, right]);
+
+  useEffect(() => {
+    if (!autoRun || autoRunStarted.current) return;
+    autoRunStarted.current = true;
+    runComparison();
+  }, [autoRun, runComparison]);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await runComparison();
   }
 
   return (
@@ -322,22 +471,14 @@ export function CompareFlow() {
                     <div className="mt-3 grid grid-cols-2 gap-3">
                       <div className="h-2 rounded-full bg-mist">
                         <div
-                          className={`h-2 origin-left rounded-full ${barClass("left", category.winner)} animate-[compareBarSweep_900ms_cubic-bezier(0.22,1,0.36,1)_forwards]`}
-                          style={{
-                            width: widths.left,
-                            transform: "scaleX(0)",
-                            animationDelay: `${delayMs}ms`
-                          }}
+                          className={`h-2 origin-left rounded-full ${barClass("left", category.winner)}`}
+                          style={barAnimationStyle(widths.left, delayMs)}
                         />
                       </div>
                       <div className="h-2 rounded-full bg-mist">
                         <div
-                          className={`h-2 origin-left rounded-full ${barClass("right", category.winner)} animate-[compareBarSweep_900ms_cubic-bezier(0.22,1,0.36,1)_forwards]`}
-                          style={{
-                            width: widths.right,
-                            transform: "scaleX(0)",
-                            animationDelay: `${delayMs}ms`
-                          }}
+                          className={`h-2 origin-left rounded-full ${barClass("right", category.winner)}`}
+                          style={barAnimationStyle(widths.right, delayMs)}
                         />
                       </div>
                     </div>
@@ -352,6 +493,13 @@ export function CompareFlow() {
             >
               <p className="text-micro uppercase text-ink/45">Final verdict</p>
               <p className="mt-2 text-sm leading-relaxed text-ink/70">{data.finalVerdict}</p>
+            </div>
+
+            <div
+              style={animationDelay(VERDICT_DELAY_MS + 250)}
+              className="mt-6 flex justify-center opacity-0 animate-fade-in"
+            >
+              <CompareShareButton data={data} />
             </div>
           </div>
         </section>

@@ -5,7 +5,10 @@ import { Navbar } from "@/components/Navbar";
 export const metadata: Metadata = {
   title: "Compare GitHub Profiles | RoastGit",
   description:
-    "Compare two GitHub profiles with deterministic scores and a dry RoastGit verdict."
+    "Compare two GitHub profiles with deterministic scores and a dry RoastGit verdict.",
+  alternates: {
+    canonical: "https://roastgit.in/compare"
+  }
 };
 
 export default function ComparePage() {
