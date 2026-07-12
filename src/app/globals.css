@@ -34,6 +34,14 @@ input::placeholder {
   color: rgba(29, 29, 27, 0.55);
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px rgb(255, 255, 255) inset;
+  -webkit-text-fill-color: rgb(var(--color-ink));
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 .fade-enter {
   opacity: 0;
 }
@@ -50,4 +58,27 @@ input::placeholder {
 .fade-exit-active {
   opacity: 0;
   transition: opacity 500ms ease;
+}
+
+@keyframes compareBarSweep {
+  from {
+    transform: scaleX(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes compareWinnerPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(29, 29, 27, 0.16);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(29, 29, 27, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(29, 29, 27, 0);
+  }
 }

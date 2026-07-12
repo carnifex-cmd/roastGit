@@ -28,7 +28,7 @@ const config: Config = {
       },
       keyframes: {
         fadeIn: {
-          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "0%": { opacity: "0", transform: "translateY(12px)" },
           "100%": { opacity: "1", transform: "translateY(0)" }
         },
         fadeOut: {
@@ -37,7 +37,7 @@ const config: Config = {
         }
       },
       animation: {
-        "fade-in": "fadeIn 600ms ease forwards",
+        "fade-in": "fadeIn 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "fade-out": "fadeOut 500ms ease forwards"
       }
     }
